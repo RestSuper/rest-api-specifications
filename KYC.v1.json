@@ -1,0 +1,325 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "KYC",
+    "version": "1.0",
+    "description": "The KYC (Know Your Customer) API returns a Rest member's super verification information",
+    "contact": {
+      "name": "Engineering",
+      "email": "Engineering@rest.com.au"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3100"
+    }
+  ],
+  "paths": {
+    "/kyc/v1/members/{id}/sm2eligibilities": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "integer",
+            "example": 1234567,
+            "minimum": 1,
+            "maximum": 999999999999
+          },
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "Member Id"
+        }
+      ],
+      "get": {
+        "summary": "Get SuperMatch2 Status",
+        "tags": [],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "superMatchStatus": {
+                      "type": "string",
+                      "enum": [
+                        "Eligible",
+                        "Ineligible"
+                      ]
+                    },
+                    "_links": {
+                      "$ref": "#/components/schemas/Links"
+                    },
+                    "superMatchReasons": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IneligibilityReason"
+                      }
+                    }
+                  },
+                  "required": [
+                    "superMatchStatus",
+                    "_links"
+                  ]
+                },
+                "examples": {
+                  "Eligible1": {
+                    "value": {
+                      "superMatchStatus": "Eligible",
+                      "_links": {
+                        "self": {
+                          "href": "/kyc/v1/members/1234567/sm2eligibilities"
+                        }
+                      }
+                    }
+                  },
+                  "Ineligible1": {
+                    "value": {
+                      "superMatchStatus": "Ineligible",
+                      "_links": {
+                        "self": {
+                          "href": "/kyc/v1/members/1234567/sm2eligibilities"
+                        }
+                      },
+                      "superMatchReasons": [
+                        {
+                          "code": 101,
+                          "reason": "Invalid plancode"
+                        },
+                        {
+                          "code": 102,
+                          "reason": "Inactive member type status"
+                        },
+                        {
+                          "code": 103,
+                          "reason": "Inactive plan type status"
+                        },
+                        {
+                          "code": 104,
+                          "reason": "Date joined fund ineligibility"
+                        },
+                        {
+                          "code": 105,
+                          "reason": "ATO TFN status ineligibility"
+                        }
+                      ]
+                    }
+                  },
+                  "Ineligible2": {
+                    "value": {
+                      "superMatchStatus": "Ineligible",
+                      "_links": {
+                        "self": {
+                          "href": "/kyc/v1/members/1234567/sm2eligibilities"
+                        }
+                      },
+                      "superMatchReasons": [
+                        {
+                          "code": 106,
+                          "reason": "Balance value ineligibility"
+                        }
+                      ]
+                    }
+                  },
+                  "Ineligible3": {
+                    "value": {
+                      "superMatchStatus": "Ineligible",
+                      "_links": {
+                        "self": {
+                          "href": "/kyc/v1/members/1234567/sm2eligibilities"
+                        }
+                      },
+                      "superMatchReasons": [
+                        {
+                          "code": 101,
+                          "reason": "Invalid plancode"
+                        },
+                        {
+                          "code": 103,
+                          "reason": "Inactive plan type status"
+                        },
+                        {
+                          "code": 105,
+                          "reason": "ATO TFN status ineligibility"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "InvalidRequest1": {
+                    "value": {
+                      "statusCode": 400,
+                      "devMessage": "Member id is invalid",
+                      "userMessage": "Invalid request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "UserError1": {
+                    "value": {
+                      "statusCode": 404,
+                      "devMessage": "Member id not found",
+                      "userMessage": "Member id not found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "SystemError1": {
+                    "value": {
+                      "statusCode": 500,
+                      "devMessage": "Internal Server Error",
+                      "userMessage": "Unexpected error",
+                      "errorCode": "500101"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-members-id-sm2eligibilities",
+        "description": "Retrieve a Rest member's SuperMatch2 eligibility status",
+        "security": [
+          {
+            "bearerAuth": []
+          },
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Error": {
+        "title": "Error",
+        "type": "object",
+        "description": "Error json attributes",
+        "properties": {
+          "statusCode": {
+            "type": "integer"
+          },
+          "devMessage": {
+            "type": "string"
+          },
+          "userMessage": {
+            "type": "string"
+          },
+          "errorCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "statusCode"
+        ]
+      },
+      "IneligibilityReason": {
+        "title": "IneligibilityReason",
+        "type": "object",
+        "description": "Ineligibility reason attributes",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "minimum": 100,
+            "maximum": 110
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "Invalid plancode",
+              "Inactive member type status",
+              "Inactive plan type status",
+              "Date joined fund ineligibility",
+              "ATO TFN status ineligibility",
+              "Balance value ineligibility"
+            ]
+          }
+        },
+        "required": [
+          "code",
+          "reason"
+        ]
+      },
+      "Links": {
+        "title": "Links",
+        "type": "object",
+        "properties": {
+          "self": {
+            "type": "object",
+            "required": [
+              "href"
+            ],
+            "properties": {
+              "href": {
+                "type": "string",
+                "format": "uri"
+              }
+            }
+          }
+        },
+        "required": [
+          "self"
+        ],
+        "description": "HRef links"
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      },
+      "apiKey": {
+        "name": "x-api-key",
+        "type": "apiKey",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    },
+    {
+      "apiKey": []
+    }
+  ]
+}
